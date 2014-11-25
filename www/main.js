@@ -43,7 +43,7 @@ var socketIoImportado = function () {
 
 
 
-$.getScript(sIP + ":" + PORTA_SIO + "/socket.io/socket.io.js", socketIoImportado);
+$.getScript("http://" + sIP + ":" + PORTA_SIO + "/socket.io/socket.io.js", socketIoImportado);
 //não sei se precisa da porta
 
 
