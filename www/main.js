@@ -90,9 +90,10 @@ function onResume() {
 }
 
 function reload(data){
-   if (data == null || typeof data === "undefined") return;
+   var url = null;
+   if (data == null || typeof data === "undefined") url = DEFAULT_URL;
    
-    var url = data.url || DEFAULT_URL;
+    var url = url || data.url;
     mainFrame.attr('src', url);
 }
 
