@@ -18,7 +18,7 @@ function getUrlParameter(name){
 }
 
 var socketIoImportado = function () {
-    socket = io(sIP);
+    socket = io(sIP + ":" + PORTA_SIO);
     //não sei se precisa da porta
 }
 
