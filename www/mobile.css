@@ -1,0 +1,39 @@
+
+@font-face {
+	font-family: "Montserrat";
+	src: url(fonts/Montserrat-Regular.ttf);
+}
+
+/* Desabilitar scroll */
+html,
+body {
+    overflow-y: hidden;
+    overflow-x: hidden;
+    font-family: Montserrat;
+}
+body {
+    position: relative;
+    background-color: black;
+}
+.message {
+    color: lightgreen;
+    text-align: center;
+    position: relative;
+    top: 10px;
+}
+.error {
+    color: red;
+    text-align: center;
+    position: relative;
+    top: 10px;
+}
+
+/* Alinhamento Vertical */
+.verticalAlign {
+    position: relative;
+    top: 25%;
+    /*transform: translateY(0%);*/
+}
+.center {
+ text-align: center;
+}

@@ -1,0 +1,51 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="mobile.css">
+    <script src="jquery-2.1.1.min.js"></script>
+    <script src="phonegap.js"></script>
+    
+    <!-- Receber arquivo do console -->
+    <script type="text/javascript">
+
+             function showQR() {
+            cordova.plugins.barcodeScanner.scan(
+                function (result) {
+                   if (!result.cancelled){
+                       window.location.assign("holder.html?aceip=" + getIP(result.text));
+                       //window.location.assign(result.text); 
+                       //alert("WOW "+result.text);
+                       //navigator.notification.alert(result.text, function(){});
+                   }
+                },
+                function (error) {
+                    alert("Erro ao escanear: " + error);
+                    navigator.notification.alert("Erro ao escanear: " + error, function(){});
+                }
+            );
+        }
+
+        document.addEventListener("deviceready", function () {
+            console.log('teste');    
+            showQR();
+        }, false);
+        
+        function getIP(s){
+            //vem como sl://IP
+            //só quero IP
+            if(s.substring(0, 5) === "sl://"){
+             return s.substring(5, s.length);   
+            }else{
+                return "erro";
+                
+        }
+
+    </script>
+</head>
+
+<body>
+   
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+    <link rel="stylesheet" href="mobile.css">
+    <script type="text/javascript" src="jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="plugins\com.phonegap.plugins.barcodescanner\www\barcodescanner.js"></script>
+    <!--<script type="text/javascript" src="phonegap-1.0.0.js"></script>-->
+    <script type="text/javascript" src="phonegap.js"></script>
+    <script type="text/javascript" src="barcodescanner.js"></script>
+
+    <!-- Receber arquivo do console -->
+    <script type="text/javascript">
+
+        function showQR() {
+            cordova.plugins.barcodeScanner.scan(
+                function (result) {
+                   if (!result.cancelled){
+                       //window.location.assign("holder.html?aceip=" + result.text);
+                       window.location.assign(result.text); 
+                       alert("WOW "+result.text);
+                       navigator.notification.alert(result.text, function(){});
+                   }
+                },
+                function (error) {
+                    alert("Erro ao escanear: " + error);
+                    navigator.notification.alert("Erro ao escanear: " + error, function(){});
+                }
+            );
+        }
+
+        document.addEventListener("deviceready", function () {
+            console.log('teste');
+            app.initialize();
+            
+            showQR();
+        }, false);
+    </script>
+</head>
+
+<body>
+    HelloW0rld
+</body>
+
+</html>
