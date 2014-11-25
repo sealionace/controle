@@ -20,6 +20,25 @@ function getUrlParameter(name){
 var socketIoImportado = function () {
     socket = io(sIP + ":" + PORTA_SIO);
     //não sei se precisa da porta
+    
+    
+   socket.on('reload', function (data) {
+       reload(data);
+   });
+   
+   socket.on('beep', function (data) {
+       //iphone ignora as vezes. aliás ele ignora tudo
+       //não tem beep nativo, vc tem que especificar o audio chamado beep.wav de até 30s
+       //como não especifiquei nem vai funfar isso
+       var vezes = data.vezes || 1;
+       navigator.notification.beep(vezes);
+   });
+   
+   socket.on('vibrate', function (data) {
+       //iphone ignora o tempo
+       var tempo = data.tempo || 500;
+       navigator.notification.vibrate(tempo);
+   });
 }
 
 
@@ -71,27 +90,12 @@ function onResume() {
 }
 
 function reload(data){
+   if (data == null || typeof data === "undefined") return;
+   
     var url = data.url || DEFAULT_URL;
     mainFrame.attr('src', url);
 }
 
-socket.on('reload', function (data) {
-    reload(data);
-});
-
-socket.on('beep', function (data) {
-    //iphone ignora as vezes. aliás ele ignora tudo
-    //não tem beep nativo, vc tem que especificar o audio chamado beep.wav de até 30s
-    //como não especifiquei nem vai funfar isso
-    var vezes = data.vezes || 1;
-    navigator.notification.beep(vezes);
-});
-
-socket.on('vibrate', function (data) {
-    //iphone ignora o tempo
-    var tempo = data.tempo || 500;
-    navigator.notification.vibrate(tempo);
-});
 
 
 
