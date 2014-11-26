@@ -9,7 +9,7 @@ var mainFrame = $('#mainFrame');
 var PORTA_SIO = 11000;
 var PORTA_ARQ = 10000;
 var sIP = getUrlParameter('aceip'); 
-var DEFAULT_URL = sIP +":"+ PORTA_ARQ + "/controller";
+var DEFAULT_URL = "http://" + sIP +":"+ PORTA_ARQ + "/controller";
 var socket = undefined;
 
 function getUrlParameter(name){
