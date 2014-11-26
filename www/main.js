@@ -3,6 +3,10 @@
 ///// sim
 //////obs.: ARQUIVO CHAMADO NO PARENT APENAS
 
+function getUrlParameter(name){
+   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+      return decodeURIComponent(name[1]);
+}
 
 //<script type="text/javascript" charset="utf-8" src="phonegap-1.0.0.js"></script>
 var mainFrame = $('#mainFrame');
@@ -12,10 +16,7 @@ var sIP = getUrlParameter('aceip');
 var DEFAULT_URL = "http://" + sIP +":"+ PORTA_ARQ + "/controller";
 var socket = undefined;
 
-function getUrlParameter(name){
-   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
-      return decodeURIComponent(name[1]);
-}
+
 
 var socketIoImportado = function () {
     socket = io(sIP + ":" + PORTA_SIO);
