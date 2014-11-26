@@ -73,4 +73,5 @@
     
     
     <gap:plugin name="com.phonegap.plugins.barcodescanner" />
+    <gap:plugin name="com.ququplay.websocket.websocket" />
 </widget>
