@@ -18,6 +18,9 @@ var sIP = getUrlParameter('aceip');
 var DEFAULT_URL = "http://" + sIP +":"+ PORTA_ARQ + "/controller";
 var socket = undefined;
 
+mainFrame.on('load', function() {
+   mainFrame.get(0).contentWindow.sIP = socket;
+})
 
 
 var socketIoImportado = function () {
