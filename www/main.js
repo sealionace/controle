@@ -1,4 +1,4 @@
-﻿///////////////////Main.js
+///////////////////Main.js
 ///// o arquivo PRINCIPAL de javascript
 ///// sim
 //////obs.: ARQUIVO CHAMADO NO PARENT APENAS
@@ -10,6 +10,8 @@ function getUrlParameter(name){
 
 //<script type="text/javascript" charset="utf-8" src="phonegap-1.0.0.js"></script>
 var mainFrame = $('#mainFrame');
+var redirector = $('#reloader');
+
 var PORTA_SIO = 11000;
 var PORTA_ARQ = 10000;
 var sIP = getUrlParameter('aceip'); 
@@ -96,7 +98,10 @@ function reload(data){
    
     var url = url || data.url;
    console.log(url);
-    mainFrame.attr('src', url);
+    redirector.attr("href", url);
+    redirector.click();
+    //mainFrame.attr('src', url);
+    
 }
 
 
