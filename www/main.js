@@ -98,8 +98,7 @@ function reload(data){
    
     var url = url || data.url;
    console.log(url);
-    redirector.attr("href", url);
-    redirector.click();
+    mainFrame.get(0).src = url;
     //mainFrame.attr('src', url);
     
 }
