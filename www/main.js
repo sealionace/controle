@@ -20,6 +20,7 @@ var socket = undefined;
 
 mainFrame.on('load', function() {
    mainFrame.get(0).contentWindow.sIP = socket;
+   $(mainFrame.get(0).contentWindow).trigger('controla')
 })
 
 
