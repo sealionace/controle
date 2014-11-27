@@ -95,6 +95,7 @@ function reload(data){
    if (data == null || typeof data === "undefined") url = DEFAULT_URL;
    
     var url = url || data.url;
+   console.log(url);
     mainFrame.attr('src', url);
 }
 
