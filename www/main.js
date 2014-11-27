@@ -1,4 +1,4 @@
-///////////////////Main.js
+﻿///////////////////Main.js
 ///// o arquivo PRINCIPAL de javascript
 ///// sim
 //////obs.: ARQUIVO CHAMADO NO PARENT APENAS
@@ -19,7 +19,7 @@ var socket = undefined;
 
 
 var socketIoImportado = function () {
-    socket = io(sIP + ":" + PORTA_SIO);
+    socket = io.connect("http://" + sIP + ":" + PORTA_SIO);
     //não sei se precisa da porta
     
     
