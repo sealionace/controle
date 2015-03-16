@@ -1,0 +1,52 @@
+<link rel="import" href="components/polymer/polymer.html"></link>
+
+<polymer-element name="sl-accel" attributes="action frequency">
+    <script>
+       Polymer('sl-accel', {
+         //socket: io(sIP),
+         action: undefined,
+         watchID: undefined,
+         frequency: 300,
+         phonegapReady: false,
+
+         ready: function() {
+           document.addEventListener("deviceready", this.onDeviceReady, false);
+         },
+
+         onDeviceReady: function() {
+           this.phonegapReady = true;
+           this.startWatch();
+         },
+
+         startWatch: function() {
+           var options = { frequency: this.frequency };
+           this.watchID = navigator.accelerometer.watchAcceleration(
+                            this.onSuccess,
+                            this.onError,
+                            options
+                          );
+         },
+
+         stopWatch: function() {
+           if ( this.watchID ) {
+             navigator.accelerometer.clearWatch(this.watchID);
+             this.watchID = undefined;
+           }
+         },
+
+         onSuccess: function(acceleration) {
+           if ( this.phonegapReady ) {
+             socket.emit(
+               'evento',
+               { call: this.call,  acceleration: acceleration }
+             );
+           }
+         },
+
+         onError: function(){
+           socket.emit('evento', { error: 'Erro ao obter dados do acelerômetro' });
+         }
+       });
+    </script>
+
+</polymer-element>

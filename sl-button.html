@@ -1,0 +1,182 @@
+<link rel="import" href="components/polymer/polymer.html">
+
+<polymer-element name="sl-button" attributes="label radius bgColor action">
+  <template>
+    <style>
+      :host .outer-button  {
+        font-family: 'Roboto', sans-serif;
+        text-align: center;
+        user-select: none;
+        position: relative;
+        display: table-cell;
+        vertical-align: middle;
+        border-radius: 50%;
+        height: {{ radius }}px;
+        width: {{ radius }}px;
+
+        background-color: {{ bgColor }};
+        overflow: hidden;
+
+        /* Fix Overflow */
+        -webkit-mask-image:  url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+        box-shadow: 0px 0px 5px #000;
+        cursor: pointer;
+      }
+
+      :host .label {
+        font-size: {{ radius / 3 }}px;
+        color: white;
+      }
+
+      .ripple-effect {
+        position: absolute;
+        border-radius: 50%;
+        width:  10px;
+        height: 10px;
+        background-color: white;
+
+        -webkit-animation: ripple-animation 1s;
+        animation: ripple-animation 1s;
+      }
+
+      @-webkit-keyframes ripple-animation {
+        from {
+          -ms-transform:  scale(1);
+          -webkit-transform:  scale(1);
+          transform: scale(1);
+          opacity: 0.3;
+        }
+
+        to {
+          -ms-transform:  scale(100);
+          -webkit-transform:  scale(100);
+          transform: scale(100);
+          opacity: 0;
+        }
+      }
+
+      @keyframes ripple-animation {
+        from {
+          -ms-transform:  scale(1);
+          -webkit-transform:  scale(1);
+          transform: scale(1);
+          opacity: 0.3;
+        }
+
+        to {
+          -ms-transform:  scale(100);
+          -webkit-transform:  scale(100);
+          transform: scale(100);
+          opacity: 0;
+        }
+      }
+
+    </style>
+
+    <div class="outer-button" id="sealion"
+         on-touchstart="{{ touchstart }}"
+         on-touchend="{{ touchend }}"
+         on-mousedown="{{ mousedown }}"
+         on-mouseup="{{ mouseup }}"
+    >
+      <span class="label"> {{ label }}  </span>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      // Get a % amount darker version of a given color
+      var darkenColor = function(color, percent) {
+        var f = parseInt(color.slice(1), 16),
+            t = percent < 0 ? 0 : 255,
+            p = percent < 0 ? percent * -1 : percent,
+            R = f >> 16,
+            G = f >> 8 & 0x00FF,
+            B = f & 0x0000FF;
+
+        return "#"+(0x1000000 +
+                    (Math.round((t - R) * p) + R) * 0x10000 +
+                    (Math.round((t - G) * p) + G) * 0x100 +
+                    (Math.round((t - B) * p) + B)
+                   ).toString(16).slice(1);
+      };
+
+      function addClass(element, classToAdd) {
+        var currentClassValue = element.className;
+
+        if (currentClassValue.indexOf(classToAdd) == -1) {
+          if ((currentClassValue == null) || (currentClassValue === "")) {
+            element.className = classToAdd;
+          } else {
+            element.className += " " + classToAdd;
+          }
+        }
+      };
+
+      Polymer({
+        action: undefined, // Action that will be called in the game logic
+        radius: "100",
+        bgColor: "blue",
+        rippleColor: "blue",
+        //Touch events
+        touchstart: function(event) {
+          event.preventDefault();
+          var touch = event.touches[0] || event.changedTouches[0];
+          this.ripple(touch);
+          socket.emit('evento', {
+            action: this.action
+          });
+        },
+
+        touchend: function(event) {
+          event.preventDefault();
+          socket.emit('evento', {
+            action: this.action
+          });
+        },
+
+        //Mouse events (for debugging)
+        mouseup: function(event) {
+          event.preventDefault();
+          socket.emit('evento', {
+            action: this.action
+          });
+        },
+
+        mousedown: function(event) {
+          event.preventDefault();
+          socket.emit('evento', {
+              action: this.action
+          });
+        },
+
+        // LADIES AND GENTLEMEN, MATERIAL DESIGN
+        ripple: function(event) {
+          var $div = document.createElement('div'),
+              xPos = event.pageX - this.$.sealion.offsetLeft,
+              yPos = event.pageY - this.$.sealion.offsetTop,
+              height = this.$.sealion.offsetHeight,
+              width = this.$.sealion.offsetWidth,
+              top = yPos - (height/2),
+              left = xPos - (height/2);
+
+          addClass($div, 'ripple-effect');
+          $div.setAttribute("style", "height:"+height+"px; width:"+width+"px; top:"+top+"px; left:"+left+"px;")
+
+          this.$.sealion.appendChild($div);
+
+          window.setTimeout(function(){
+            $div.remove();
+          }, 1000);
+
+        },
+
+        ready: function() {
+          this.rippleColor = darkenColor(this.bgColor, 0.2);
+        }
+      });
+    })();
+  </script>
+
+</polymer-element>

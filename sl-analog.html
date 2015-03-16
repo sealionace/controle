@@ -1,0 +1,218 @@
+<link rel="import" href="components/polymer/polymer.html"></link>
+<polymer-element name="sl-analog" attributes="radius sensibility action outerColor innerColor">
+  <template>
+    <style>
+      :host .circle  {
+        border-radius: 100%;
+      }
+
+      .outer {
+        position: relative;
+        background-color: {{ outerColor }};
+        width: {{ radius * 2 }}px;
+        height: {{ radius * 2 }}px;
+        box-shadow: inset 0px 0px {{radius /8 }}px {{radius / 10}}px rgba(0,0,0,0.25);
+      }
+
+      .holder {
+        width:  {{ radius / 4 }}px;
+        height: {{ radius / 4 }}px;
+        left:  {{ radius - ( radius / 8 ) }}px;
+        top:  {{ radius - ( radius / 8 ) }}px;
+        position: absolute;
+        background-color: black;
+      }
+
+      .inner {
+        box-shadow: inset 0px 0px {{radius /8 }}px {{radius / 10}}px rgba(0,0,0,0.45);
+        width: {{ radius }}px;
+        height: {{ radius }}px;
+        background-color: {{ innerColor }};
+        background-size: 100%;
+        position: absolute;
+        /*  100% Turns the center of the outer circle into the origin of rotation */
+        -webkit-transform-origin: 100% 100%;
+        -moz-transform-origin: 100% 100%;
+        transform-origin: 100% 100%;
+      }
+
+    </style>
+
+    <div id='fixo' class='circle outer' >
+      <div id='meio' class='circle holder' ></div>
+      <div id='movel' class='circle inner'
+             on-mousedown="{{mdown}}"
+             on-touchstart="{{touchstart}}"
+             on-mousemove="{{mmove}}"
+             on-touchmove="{{touchmove}}"
+             on-touchend="{{touchend}}"
+             on-mouseup="{{mup}}"
+             on-mouseout="{{mup}}">
+
+      </div>
+    </div>
+<!--    <p id="cor">angle: {{angle}}<br>
+          <br> intensidade: <meter value="{{gap.distance/MAX_DISTANCE}}">intensidade</meter></p> -->
+  </template>
+  <script>
+
+  (function() {
+    //Adds a css class to a given element
+    function addClass(element, classToAdd) {
+      var currentClassValue = element.className;
+
+      if (currentClassValue.indexOf(classToAdd) == -1) {
+        if ((currentClassValue == null) || (currentClassValue === "")) {
+          element.className = classToAdd;
+        } else {
+            element.className += " " + classToAdd;
+        }
+      }
+    };
+
+    Polymer('sl-analog', {
+      //Event that will be called on game
+      action: undefined,
+      //socket: io(sIP),
+      //Colors
+      outerColor: 'darkgrey',
+      innerColor: 'grey',
+
+      angle: 0.0,
+      lastAngle: 0.0,
+      sensibility: 2,
+
+      gap: { x: 0.0, y: 0.0, distance: 0.0 }, //distance between centers and their coordinates
+      radius: 100,
+
+      //Maximum distance between the inner circle and the outer circle
+      MAX_DISTANCE: undefined,
+
+      outerCenter: { x: 0, y: 0 },
+
+      dragging: false,
+
+      updateAngle: function() {
+        var style = 'rotate(' + (this.angle * (-1) + 45) + 'deg) ' +
+                    'translate('+
+                    (this.radius - (this.radius / 2) - this.gap.x) + 'px , ' +
+                    (this.radius - (this.radius / 2) - this.gap.y) + 'px)'
+
+        this.$.movel.style.transform = style;
+      },
+
+      angleChanged: function() {
+        this.updateAngle();
+
+        if (Math.abs(this.angle - this.lastAngle) >= this.sensibility) {
+           socket.emit('evento', {
+             action: this.action,
+             angle: 360 - this.angle,
+             distance: this.gap.distance,
+             distanceMaxima: this.MAX_DISTANCE,
+             intensidade: this.intensity()
+           });
+        }
+
+        this.lastAngle = this.angle;
+      },
+
+      gapChanged: function() {
+        this.updateAngle();
+
+        socket.emit('evento', {
+          action: this.action,
+          angle: 360 - this.angle,
+          distance: this.gap.distance,
+          maxDistance: this.MAX_DISTANCE,
+          intensidade: this.intensity()
+        });
+
+        this.lastAngle = this.angle;
+      },
+
+      updateTouch: function(touch) {
+        this.updatePosition(touch.pageX, touch.pageY);
+      },
+
+      updatePosition: function(x, y) {
+        var currentDistance = Math.sqrt(Math.pow(x - this.outerCenter.x, 2) + Math.pow( y - this.outerCenter.y, 2));
+
+        var alpha =  90 - (Math.atan( (this.outerCenter.y - y) / (this.outerCenter.x - x) ) * 180 / Math.PI);
+        if ((this.outerCenter.x - x) < 0) {
+          alpha += 180;
+        }
+
+
+        this.angle = alpha;
+
+        var minDistance = Math.min(currentDistance, this.MAX_DISTANCE);
+        var lado = Math.sqrt(Math.pow(this.gap.distance, 2) / 2);
+
+        this.gap = { x: lado, y: lado, distance: minDistance };
+      },
+
+      intensity: function() {
+        return this.gap.distance / this.MAX_DISTANCE;
+      },
+
+      touchstart: function(e) {
+        e.preventDefault();
+        var touch = e.touches[0] || e.changedTouches[0];
+        this.updateTouch(touch);
+        this.dragging = true;
+      },
+
+      mdown: function(e) {
+        this.updatePosition(e.pageX, e.pageY);
+        this.dragging = true;
+      },
+
+      touchmove: function(e) {
+        e.preventDefault();
+        if (this.dragging) {
+          var touch = e.touches[0] || e.changedTouches[0];
+          this.updateTouch(touch);
+        }
+      },
+
+      mmove: function(e) {
+        if (this.dragging)
+          this.updatePosition(e.pageX, e.pageY);
+      },
+
+      touchend: function(e) {
+        e.preventDefault();
+        this.angle = 0.0;
+        this.gap = { x: 0.0, y: 0.0, distance: 0.0 }
+        this.dragging = false;
+      },
+
+      mup: function(e) {
+        this.angle = 0.0;
+        this.gap = { x: 0.0, y: 0.0, distance: 0.0 }
+        this.dragging = false;
+      },
+
+      ready: function() {
+        var holdCircle, outerCircle, innerCircle, outerRect;
+        this.MAX_DISTANCE = (this.radius / 2) + (this.radius / 2);
+
+        outerCircle = this.$.fixo;
+        holdCircle = this.$.meio;
+        innerCircle = this.$.movel;
+
+        outerRect = outerCircle.getBoundingClientRect();
+        this.outerCenter = { x: outerRect.left + this.radius, y: outerRect.top + this.radius };
+
+        this.gap.distance = 0;
+
+        addClass(holdCircle, "holder");
+        addClass(outerCircle, "outer");
+        addClass(innerCircle, "inner");
+      },
+    });
+  })();
+  </script>
+
+</polymer-element>
